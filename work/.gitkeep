@@ -1,0 +1,2 @@
+# This file ensures the work/ directory is tracked by git
+# Notebooks and data files saved here will persist between container runs

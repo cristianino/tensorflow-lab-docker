@@ -1,0 +1,16 @@
+services:
+  tf-lab:
+    build: .
+    ports:
+      - "127.0.0.1:8888:8888"
+    volumes:
+      - ./work:/tf/work
+    environment:
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-tf_local_secure}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
