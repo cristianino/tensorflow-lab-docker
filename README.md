@@ -174,6 +174,70 @@ The `work/tenzorflow.ipynb` notebook includes comprehensive TensorFlow examples:
 
 All examples are designed to work seamlessly on both GPU and CPU, automatically adapting to available hardware.
 
+## Model Conversion to TensorFlow.js
+
+This environment supports converting TensorFlow/Keras models to TensorFlow.js format for web deployment. Due to compatibility issues between the new Keras 3.x format (`.keras` files) and TensorFlow.js converter, follow these steps:
+
+### Converting .keras Models to TensorFlow.js
+
+If you have a model in the newer `.keras` format (TensorFlow 2.16+), you need to convert it to H5 format first:
+
+```python
+# Inside a Jupyter notebook or Python script
+import tensorflow as tf
+
+# Load your .keras model
+model = tf.keras.models.load_model('your_model.keras')
+
+# Save in H5 format (compatible with tensorflowjs_converter)
+model.save('your_model.h5', save_format='h5')
+```
+
+### Using TensorFlow.js Converter
+
+Once you have an H5 file, convert it to TensorFlow.js format:
+
+```bash
+# Inside the container terminal
+tensorflowjs_converter \
+    --input_format=keras \
+    your_model.h5 \
+    ./tfjs_model_output/
+```
+
+### Example: MNIST Model Conversion
+
+```bash
+# Example conversion of the included MNIST model
+# 1. First convert .keras to .h5 (run in Jupyter):
+import tensorflow as tf
+model = tf.keras.models.load_model('/tf/work/mnist_cnn_tf.keras')
+model.save('/tf/work/mnist_cnn_tf.h5', save_format='h5')
+
+# 2. Then convert H5 to TensorFlow.js (run in terminal):
+tensorflowjs_converter \
+    --input_format=keras \
+    mnist_cnn_tf.h5 \
+    ./tfjs_model/
+```
+
+### Expected Output
+
+The conversion will create:
+- `model.json` - Model architecture and metadata
+- `group1-shard1of1.bin` - Model weights (may be split into multiple shards for large models)
+
+### Troubleshooting Model Conversion
+
+**Common Error:** `OSError: Unable to synchronously open file (file signature not found)`
+- **Cause:** Trying to convert `.keras` format directly with `tensorflowjs_converter`
+- **Solution:** Convert to H5 format first as shown above
+
+**Version Compatibility:**
+- TensorFlow.js converter works best with H5 format models
+- Keras 3.x format (`.keras`) requires intermediate conversion to H5
+- All conversion tools are pre-installed in this container
+
 ## Testing GPU Functionality
 
 Once you have JupyterLab running, create a new notebook and test GPU functionality:

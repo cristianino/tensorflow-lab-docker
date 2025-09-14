@@ -10,7 +10,8 @@ RUN pip install --no-cache-dir \
     plotly \
     scikit-learn \
     tqdm \
-    ipywidgets
+    ipywidgets \
+    tensorflowjs
 
 # Set working directory
 WORKDIR /tf/work
