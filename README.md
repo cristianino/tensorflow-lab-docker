@@ -1,6 +1,14 @@
 # TensorFlow Lab Docker
 
-Dockerized TensorFlow + JupyterLab environment with GPU support for quick and reproducible ML experiments.
+Dockerized TensorFlow + JupyterLab environment with GPU support for quick anddocker-compose up --build
+```
+
+### 6. Access JupyterLab (HTTPS)
+Open your browser and navigate to: `https://127.0.0.1:8888/lab?token=your-token`
+
+Replace `your-token` with the token you set in the `.env` file.
+
+⚠️ **Note**: Since we're using self-signed certificates, your browser will show a security warning. Click "Advanced" and "Proceed to 127.0.0.1" to continue. This is safe for local development.ucible ML experiments.
 
 ## Features
 
@@ -8,7 +16,9 @@ Dockerized TensorFlow + JupyterLab environment with GPU support for quick and re
 - **Pre-installed Data Science Libraries**: numpy, pandas, matplotlib, seaborn, plotly, scikit-learn, tqdm, ipywidgets
 - **JupyterLab Interface**: Modern web-based interactive development environment
 - **GPU Acceleration**: Full NVIDIA GPU support with Docker Compose
+- **HTTPS Security**: SSL/TLS encryption with self-signed certificates
 - **Persistent Storage**: Mount local `work/` directory for notebooks and data
+- **Token Authentication**: Secure access with configurable authentication tokens
 
 ## Prerequisites
 
@@ -79,12 +89,30 @@ cp .env.example .env
 echo "JUPYTER_TOKEN=your-secure-token-here" > .env
 ```
 
-### 3. Create work directory (if it doesn't exist)
+### 3. Generate SSL certificates (for HTTPS)
+
+**Option A: Using the provided script (recommended)**
+```bash
+# Run the certificate generation script
+./generate-certs.sh
+```
+
+**Option B: Manual generation**
+```bash
+# Generate self-signed SSL certificates for secure access
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout mykey.key -out mycert.pem \
+    -subj "/C=ES/ST=State/L=City/O=Organization/OU=OrgUnit/CN=localhost"
+
+# The certificates will be valid for 365 days
+```
+
+### 4. Create work directory (if it doesn't exist)
 ```bash
 mkdir -p work
 ```
 
-### 4. Start the container
+### 5. Start the container
 ```bash
 # Use docker compose (modern Docker)
 docker compose up --build
@@ -272,7 +300,27 @@ sudo chown -R $USER:$USER work/
 chmod 755 work/
 ```
 
-#### 4. Token issues
+#### 4. SSL Certificate issues
+If you get SSL/certificate errors:
+```bash
+# Regenerate the certificates
+rm -f mykey.key mycert.pem
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout mykey.key -out mycert.pem \
+    -subj "/C=ES/ST=State/L=City/O=Organization/OU=OrgUnit/CN=localhost"
+
+# Restart the container
+docker compose down && docker compose up --build
+```
+
+#### 5. Browser security warnings
+#### 5. Browser security warnings
+When using self-signed certificates, browsers will show security warnings. This is normal for local development:
+- Click "Advanced" or "Show details"
+- Click "Proceed to 127.0.0.1" or "Continue to site"
+- For production use, consider using proper SSL certificates from a CA
+
+#### 6. Token issues
 Verify the `JUPYTER_TOKEN` in your `.env` file and make sure it matches the URL:
 ```bash
 cat .env
