@@ -12,17 +12,11 @@ RUN pip install --no-cache-dir \
     tqdm \
     ipywidgets
 
-# Create directory for SSL certificates
-RUN mkdir -p /tf/ssl
-
 # Set working directory
 WORKDIR /tf/work
 
-# Expose Jupyter Lab port (HTTPS)
+# Expose Jupyter Lab port
 EXPOSE 8888
 
-# Copy SSL certificates (will be mounted as volume)
-# Start Jupyter Lab with HTTPS and token authentication
-CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", \
-     "--certfile=/tf/ssl/mycert.pem", "--keyfile=/tf/ssl/mykey.key", \
-     "--NotebookApp.token=${JUPYTER_TOKEN}"]
+# Start Jupyter Lab con configuración estándar
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]

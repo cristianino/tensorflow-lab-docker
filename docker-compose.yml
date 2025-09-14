@@ -5,10 +5,6 @@ services:
       - "127.0.0.1:8888:8888"
     volumes:
       - ./work:/tf/work
-      - ./mycert.pem:/tf/ssl/mycert.pem:ro
-      - ./mykey.key:/tf/ssl/mykey.key:ro
-    environment:
-      - JUPYTER_TOKEN=${JUPYTER_TOKEN}
     deploy:
       resources:
         reservations:
